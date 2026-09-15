@@ -12,11 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_shift', function (Blueprint $table) {
-            $table->after('initial_capital', function (Blueprint $table) {
-                $table->decimal('cash_actual', total: 64, places: 0)->default(0);
-                $table->decimal('cash_out', total: 64, places: 0)->default(0);
-                $table->text('cash_out_info');
-            });
+            if (!Schema::hasColumn('user_shift', 'cash_actual')) {
+                $table->decimal('cash_actual', 64, 0)->nullable()->default(0);
+            }
+
+            if (!Schema::hasColumn('user_shift', 'cash_out')) {
+                $table->decimal('cash_out', 64, 0)->nullable()->default(0);
+            }
+
+            if (!Schema::hasColumn('user_shift', 'cash_out_info')) {
+                $table->text('cash_out_info')->nullable();
+            }
         });
     }
 
@@ -26,7 +32,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('user_shift', function (Blueprint $table) {
-            //
+            $columns = array_filter([
+                Schema::hasColumn('user_shift', 'cash_actual') ? 'cash_actual' : null,
+                Schema::hasColumn('user_shift', 'cash_out') ? 'cash_out' : null,
+                Schema::hasColumn('user_shift', 'cash_out_info') ? 'cash_out_info' : null,
+            ]);
+
+            if ($columns !== []) {
+                $table->dropColumn($columns);
+            }
         });
     }
 };

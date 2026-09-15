@@ -30,7 +30,8 @@ class ItemsReportController extends Controller
         if ($start_date == $end_date) {
             $orderItems->whereDate('i.created_at', '=', $start_date);
         } else {
-            $orderItems->whereBetween('i.created_at', [$start_date, $end_date]);
+            $orderItems->whereDate('i.created_at', '>=', $start_date)
+                ->whereDate('i.created_at', '<=', $end_date);
         }
 
         $menu = DB::table('fnb_menus', 'm')
@@ -65,7 +66,8 @@ class ItemsReportController extends Controller
         if ($start_date == $end_date) {
             $orderItems->whereDate('i.created_at', '=', $start_date);
         } else {
-            $orderItems->whereBetween('i.created_at', [$start_date, $end_date]);
+            $orderItems->whereDate('i.created_at', '>=', $start_date)
+                ->whereDate('i.created_at', '<=', $end_date);
         }
 
         $menu = DB::table('fnb_menus', 'm')

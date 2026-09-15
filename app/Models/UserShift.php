@@ -17,6 +17,7 @@ class UserShift extends Model
         'initial_capital',
         'cash_actual',
         'cash_out',
+        'cash_out_info',
         'shift_info',
         'shift_active',
     ];

@@ -8,7 +8,7 @@ use App\Http\Controllers\Prices\DiscountsController;
 use App\Http\Controllers\Prices\OpenBillingController;
 use App\Http\Controllers\Prices\PackagesController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Reports\ItemsReportController;
+use App\Http\Controllers\Reports\ItemsReportV2Controller;
 use App\Http\Controllers\Reports\ShiftReportController;
 use App\Http\Controllers\Reports\UserReportController;
 use App\Http\Controllers\Services\ShiftServiceController;
@@ -179,9 +179,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/byshift/data', [ShiftReportController::class, 'data']);
         Route::get('/byshift/print', [ShiftReportController::class, 'print']);
 
-        Route::get('/byitems', [ItemsReportController::class, 'index'])->name('reports.byitems');
-        Route::get('/byitems/data', [ItemsReportController::class, 'data']);
-        Route::get('/byitems/chart', [ItemsReportController::class, 'chart']);
+        Route::get('/byitems', [ItemsReportV2Controller::class, 'index'])->name('reports.byitems');
+        Route::get('/byitems/data', [ItemsReportV2Controller::class, 'data']);
+        Route::get('/byitems/data-summary', [ItemsReportV2Controller::class, 'dataSummary']);
+        Route::get('/byitems/data-tables', [ItemsReportV2Controller::class, 'dataByTables']);
+        Route::get('/byitems/data-fnb', [ItemsReportV2Controller::class, 'dataByFnb']);
 
         Route::get('/byuser', [UserReportController::class, 'index'])->name('reports.byuser');
         Route::get('/byuser/data', [UserReportController::class, 'data']);

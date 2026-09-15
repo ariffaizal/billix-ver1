@@ -5,7 +5,9 @@ $(function () {
         },
     });
 
-    $("#btnOpenShift").click(function () {
+    // Gunakan Event Delegation untuk Open Shift
+    $(document).on("click", "#btnOpenShift", function (e) {
+        e.preventDefault();
         $("#modalAddShift").modal("show");
     });
 
@@ -21,7 +23,6 @@ $(function () {
             contentType: false,
             cache: false,
             processData: false,
-            // async: false,
             success: function (respon) {
                 Swal.fire({
                     icon: "success",
@@ -37,14 +38,15 @@ $(function () {
                 Swal.fire({
                     icon: "error",
                     title: "Error!",
-                    text: e.responseJSON.message,
+                    text: e.responseJSON ? e.responseJSON.message : "Terjadi kesalahan",
                 });
             },
         });
     });
 
-    // Close Shift
-    $("#btnCloseShift").click(function () {
+    // Gunakan Event Delegation untuk Close Shift
+    $(document).on("click", "#btnCloseShift", function (e) {
+        e.preventDefault();
         let id = $(this).attr("data-id");
         $("#modalCloseShift").modal("show");
         $('#modalCloseShift [name="id_shift"]').val(id);
@@ -70,19 +72,16 @@ $(function () {
                     method: "POST",
                     data: data,
                     enctype: "multipart/form-data",
-                    data: data,
                     contentType: false,
                     cache: false,
                     processData: false,
                     success: function (m) {
                         Swal.fire({
                             icon: "success",
-                            // title: "Shift Closed!",
                             text: "Your Shift has been closed.",
                             showConfirmButton: false,
                             timer: 1000,
                         }).then(function () {
-                            console.log(m);
                             window.location.replace(
                                 "/reports/closeshift?id=" + m.id_user_shift
                             );
@@ -92,7 +91,7 @@ $(function () {
                         Swal.fire({
                             icon: "error",
                             title: "Error!",
-                            text: e.responseJSON.message,
+                            text: e.responseJSON ? e.responseJSON.message : "Terjadi kesalahan",
                         });
                     },
                 });
