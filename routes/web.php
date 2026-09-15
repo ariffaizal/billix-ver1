@@ -178,6 +178,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/byshift', [ShiftReportController::class, 'index'])->name('reports.byshift');
         Route::get('/byshift/data', [ShiftReportController::class, 'data']);
         Route::get('/byshift/print', [ShiftReportController::class, 'print']);
+        Route::get('/byshift/details', [ShiftReportController::class, 'details']);
 
         Route::get('/byitems', [ItemsReportV2Controller::class, 'index'])->name('reports.byitems');
         Route::get('/byitems/data', [ItemsReportV2Controller::class, 'data']);

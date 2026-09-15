@@ -152,6 +152,29 @@
 
     $netAmount = $totalAmount - $totalDiscount - $totalRefund;
 
+    // Rekap total pendapatan FnB per kategori beserta detail item terjual
+    $fnbByCategories = OrderItems::query()
+        ->join('fnb_menus', 'order_items.id_fnb', '=', 'fnb_menus.id_fnb')
+        ->join('fnb_category', 'fnb_menus.id_fnbcategory', '=', 'fnb_category.id_fnbcategory')
+        ->where('order_items.is_fnb', 1)
+        ->whereIn('order_items.id_order', $data['shift']->orders->where('order_status', 9)->pluck('id_order'))
+        ->selectRaw('
+            fnb_category.id_fnbcategory,
+            fnb_category.category_name,
+            order_items.fnb_name,
+            order_items.fnb_price,
+            SUM(order_items.fnb_qty) as total_qty,
+            SUM(order_items.items_amount) as total_amount
+        ')
+        ->groupBy(
+            'fnb_category.id_fnbcategory',
+            'fnb_category.category_name',
+            'order_items.fnb_name',
+            'order_items.fnb_price'
+        )
+        ->get()
+        ->groupBy('category_name');
+
 @endphp
 
 <body onload="">
@@ -269,12 +292,44 @@
                     <td class="text-bold">Net Amount</td>
                     <td class="text-bold text-end">{{ Number::format($netAmount) }}</td>
                 </tr>
-                {{-- 
+                <!-- FnB Sales Breakdown by Category & Items -->
                 <tr>
-                    <td>Refunds</td>
-                    <td class="text-end">{{ Number::format($orderRefund) }}</td>
+                    <td>&nbsp;</td>
+                    <td></td>
                 </tr>
-                --}}
+                <tr>
+                    <td class="text-bold" colspan="2">3. FnB Sales by Category & Items</td>
+                </tr>
+                @forelse($fnbByCategories as $categoryName => $items)
+                    <tr>
+                        <td class="text-bold" style="padding-left: 5px;" colspan="2">
+                            [{{ $categoryName }}]
+                        </td>
+                    </tr>
+                    @foreach($items as $item)
+                        <tr>
+                            <td style="padding-left: 15px;">
+                                {{ $item->fnb_name }}<br>
+                                <small style="color: #555;">{{ $item->total_qty }} x {{ Number::format($item->fnb_price) }}</small>
+                            </td>
+                            <td class="text-end" style="vertical-align: bottom;">
+                                {{ Number::format($item->total_amount) }}
+                            </td>
+                        </tr>
+                    @endforeach
+                    <tr>
+                        <td class="text-bold" style="padding-left: 15px;">Subtotal {{ $categoryName }}</td>
+                        <td class="text-bold text-end">{{ Number::format($items->sum('total_amount')) }}</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td></td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td style="padding-left: 10px;" colspan="2"><em>Tidak ada penjualan FnB</em></td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
         <hr>

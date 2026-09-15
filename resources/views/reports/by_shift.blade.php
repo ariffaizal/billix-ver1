@@ -75,6 +75,7 @@
                                     {{-- <th>Invoice</th> --}}
                                     <th>Items / Table</th>
                                     <th>Qty</th>
+                                    <th>Method</th>
                                     <th>Status</th>
                                     <th>Amount</th>
                                 </tr>
@@ -209,7 +210,7 @@
                     table.ajax.reload();
                 });
 
-                // 3. Event Handler Klik ID untuk Detail Per Item
+                // Event Handler Klik ID untuk Detail Per Item
                 $('#tabelData').on('click', '.btn-detail', function() {
                     const id = $(this).data('id');
                     $('#detailShiftId').text(id);
@@ -225,38 +226,40 @@
                         success: function(data) {
                             currentShiftData = data; // Simpan untuk CSV
                             let html = '';
-                            if (data.length > 0) {
+                            if (Array.isArray(data) && data.length > 0) {
                                 data.forEach(order => {
                                     const status = order.order_status == 9 ?
                                         '<span class="badge bg-success">Success</span>' :
                                         '<span class="badge bg-danger">Refund</span>';
 
-                                    (order.items || []).forEach(item => {
-                                        const itemName = item.fnb_name || item
-                                            .table_name || item.package_name ||
-                                            item.regular_name || item
-                                            .openbill_name || '-';
+                                    (order.order_items || order.orderItems || []).forEach(item => {
+                                        const itemName = item.fnb_name || item.table_name || item.package_name ||
+                                            item.regular_name || item.openbill_name || '-';
                                         const qty = item.fnb_qty || 1;
-                                        const amount = item.fnb_amount || item
-                                            .regular_totalprice ||
-                                            item.openbill_totalprice || item
-                                            .items_amount || 0;
+                                        const amount = item.fnb_amount || item.regular_totalprice ||
+                                            item.openbill_totalprice || item.items_amount || 0;
 
                                         html += `<tr>
-                                        <td>${moment(order.created_at).format('HH:mm:ss')}</td>
-                                        <td>${itemName}</td>
-                                        <td class="text-center">${qty}</td>
-                                        <td>${order.pay_method}</td>
-                                        <td>${status}</td>
-                                        <td class="text-end">${new Intl.NumberFormat('id-ID').format(amount)}</td>
-                                    </tr>`;
+                                            <td>${moment(order.created_at).format('HH:mm:ss')}</td>
+                                            <td>${itemName}</td>
+                                            <td class="text-center">${qty}</td>
+                                            <td>${order.pay_method || '-'}</td>
+                                            <td>${status}</td>
+                                            <td class="text-end">${new Intl.NumberFormat('id-ID').format(amount)}</td>
+                                        </tr>`;
                                     });
                                 });
-                            } else {
-                                html =
-                                    '<tr><td colspan="6" class="text-center">No items found</td></tr>';
                             }
+            
+                            if (html === '') {
+                                html = '<tr><td colspan="6" class="text-center">No items found</td></tr>';
+                            }
+            
                             $('#listDetail').html(html);
+                        },
+                        error: function(xhr) {
+                            console.error(xhr.responseText);
+                            $('#listDetail').html('<tr><td colspan="6" class="text-center text-danger">Failed to load data. Check console for details.</td></tr>');
                         }
                     });
                 });

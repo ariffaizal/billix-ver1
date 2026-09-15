@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
 class Orders extends Model
@@ -32,6 +33,22 @@ class Orders extends Model
         'has_refunded',
         'refund_order_id',
     ];
+
+    /**
+     * Relasi ke model OrderItems
+     */
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItems::class, 'id_order', 'id_order');
+    }
+
+    /**
+     * Alias relasi items untuk kompatibilitas script CSV/Frontend
+     */
+    public function items(): HasMany
+    {
+        return $this->hasMany(OrderItems::class, 'id_order', 'id_order');
+    }
 
     public function getOrderByShift($id_user_shift)
     {

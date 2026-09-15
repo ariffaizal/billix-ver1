@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class UserShift extends Model
 {
@@ -21,4 +23,16 @@ class UserShift extends Model
         'shift_info',
         'shift_active',
     ];
+
+    // Relasi ke Model User
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_user', 'id');
+    }
+
+    // Relasi ke Model Orders
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Orders::class, 'id_user_shift', 'id_user_shift');
+    }
 }
