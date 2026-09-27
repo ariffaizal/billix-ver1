@@ -31,6 +31,8 @@ class DeleteExpiredSession extends Command
         $tableActive = DB::table('table_active')
             ->where('is_openbill', 0)
             ->where('is_active', 1)
+            ->whereNotNull('time_start')
+            ->whereNotNull('time_limit')
             ->whereRaw('NOW() > ADDTIME(time_start, time_limit)');
 
         $getTables = Tables::whereIn('id_table', $tableActive->pluck('id_table'))->get();

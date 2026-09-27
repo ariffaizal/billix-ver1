@@ -66,6 +66,7 @@ class TableServicesController extends Controller
                         'id_order' => $i->id_order,
                         'is_openbill' => 1,
                         'time_start' => $time_start,
+                        'time_limit' => null,
                         'is_active' => 1,
                         'is_started' => 1,
                     ]
@@ -75,9 +76,11 @@ class TableServicesController extends Controller
                     ->where('id_order', $i->id_order)
                     ->update(
                         [
+                            'is_openbill' => 0,
+                            'time_start' => $time_start,
+                            'time_limit' => $i->package_time_limit ?? '00:00:00',
                             'is_active' => 1,
                             'is_started' => 1,
-                            'time_start' => $time_start,
                         ]
                     );
             }

@@ -8,4 +8,4 @@ use Illuminate\Support\Facades\Schedule;
 //     $this->comment(Inspiring::quote());
 // })->purpose('Display an inspiring quote')->hourly();
 
-// Schedule::command('delete:delete-inactive-board')->everyFiveSeconds()->runInBackground();
+Schedule::command('delete:expired-session')->everyFiveSeconds()->runInBackground();
