@@ -99,6 +99,40 @@ class Orders extends Model
             ->first();
     }
 
+    public function getShiftSummary($id_user_shift): array
+    {
+        $shift = \App\Models\UserShift::find($id_user_shift);
+        $orders = static::where('id_user_shift', $id_user_shift)->get();
+
+        $cash = (float) $orders->where('order_status', 9)->where('pay_method', 'Cash')->sum('price_total');
+        $transfer = (float) $orders->where('order_status', 9)->where('pay_method', 'Transfer')->sum('price_total');
+        $qris = (float) $orders->where('order_status', 9)->where('pay_method', 'QRIS')->sum('price_total');
+        $other = (float) $orders->where('order_status', 9)->where('pay_method', 'Other')->sum('price_total');
+        $refund = (float) $orders->where('order_status', 7)->sum('price_total');
+
+        $openingCash = (float) ($shift?->initial_capital ?? 0);
+        $totalSales = $cash + $transfer + $qris + $other;
+        $totalAmount = $openingCash + $totalSales;
+        $netAmount = $totalAmount - $refund;
+
+        $expectedCash = $openingCash + $cash - (float) ($shift?->cash_out ?? 0);
+        $diff = (float) ($shift?->cash_actual ?? 0) - $expectedCash;
+
+        return [
+            'opening_cash' => $openingCash,
+            'cash' => $cash,
+            'transfer' => $transfer,
+            'qris' => $qris,
+            'other' => $other,
+            'total_sales' => $totalSales,
+            'total' => $totalAmount,
+            'refund' => $refund,
+            'net' => $netAmount,
+            'expected_cash' => $expectedCash,
+            'diff' => $diff,
+        ];
+    }
+
     public function sumOrderRefundByShift($id_user_shift)
     {
         return DB::table('orders')
